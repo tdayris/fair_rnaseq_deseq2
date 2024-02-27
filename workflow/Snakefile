@@ -1,0 +1,43 @@
+include: "rules/common.smk"
+
+
+if config.get("load_genome_indexer", True):
+
+    include: "rules/fair_genome_indexer.smk"
+
+
+if config.get("load_fastqc_multiqc", True):
+
+    include: "rules/fair_fastqc_multiqc.smk"
+
+
+if config.get("load_rnaseq_salmon_quant", True):
+
+    include: "rules/fair_rnaseq_salmon_quant.smk"
+
+
+include: "rules/deseq2.smk"
+include: "rules/enhanced_volcano.smk"
+include: "rules/in_house_graphs.smk"
+include: "rules/pca_explorer.smk"
+
+
+rule fair_rnaseq_deseq2_target:
+    input:
+        unpack(get_fair_rnaseq_deseq2_target_input),
+    output:
+        temp(touch("tmp/targets/fair_rnaseq_deseq2_target.flag")),
+    localrule: True
+    threads: 1
+    resources:
+        mem_mb=512,
+        runtime=2,
+        tmpdir="tmp",
+    log:
+        "logs/fair_rnaseq_deseq2/target.log",
+    benchmark:
+        "benchmark/fair_rnaseq_deseq2/target.tsv"
+    conda:
+        "envs/bash.yaml"
+    shell:
+        "sleep 1"
